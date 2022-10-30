@@ -1,0 +1,45 @@
+CAPI=2:
+
+name : asics.ws::aes:1.1
+
+filesets:
+  rtl:
+    files:
+      - rtl/verilog/timescale.v : {is_include_file : true}
+      - rtl/verilog/aes_rcon.v
+      - rtl/verilog/aes_sbox.v
+      - rtl/verilog/aes_inv_sbox.v
+      - rtl/verilog/aes_key_expand_128.v
+      - rtl/verilog/aes_inv_cipher_top.v
+      - rtl/verilog/aes_cipher_top.v
+    file_type : verilogSource
+
+  sky130:
+    files:
+      - data/sky130.tcl : {file_type : tclSource}
+
+  tb:
+    files:
+      - bench/verilog/test_bench_top.v : {file_type : verilogSource}
+
+targets:
+  default:
+    filesets : [rtl]
+
+  lint:
+    default_tool: verilator
+    filesets : [rtl]
+    tools:
+      verilator:
+        mode: lint-only
+    toplevel : aes_cipher_top
+
+  sim:
+    default_tool : icarus
+    filesets : [rtl, tb]
+    toplevel : test
+
+  sky130:
+    default_tool : openlane
+    filesets: [rtl, sky130]
+    toplevel : aes_cipher_top

@@ -1,0 +1,48 @@
+name: run-fusesoc-targets
+on: [push]
+
+jobs:
+  build-openlane-sky130:
+    runs-on: ubuntu-latest
+    env:
+      REPO : aes_core
+      VLNV : asics.ws::aes
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          path: aes_core
+      - run: echo "EDALIZE_LAUNCHER=el_docker" >> $GITHUB_ENV
+      - run: pip3 install fusesoc
+      - run: fusesoc library add $REPO $GITHUB_WORKSPACE/$REPO
+      - run: fusesoc run --target=sky130 $VLNV
+
+  lint-verilator:
+    runs-on: ubuntu-latest
+    env:
+      REPO : aes_core
+      VLNV : asics.ws::aes
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          path: aes_core
+      - run: sudo apt install verilator
+      - run: pip3 install fusesoc
+      - run: fusesoc library add $REPO $GITHUB_WORKSPACE/$REPO
+      - run: fusesoc run --target=lint $VLNV
+
+  sim-icarus:
+    runs-on: ubuntu-latest
+    env:
+      REPO : aes_core
+      VLNV : asics.ws::aes
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          path: aes_core
+      - run: sudo apt install iverilog
+      - run: pip3 install fusesoc
+      - run: fusesoc library add $REPO $GITHUB_WORKSPACE/$REPO
+      - run: fusesoc run --target=sim $VLNV
